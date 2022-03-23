@@ -28,6 +28,12 @@ const server = app.listen(HTTP_PORT, () => {
     console.log('App listening on port %PORT%'.replace('%PORT%', HTTP_PORT))
 });
 
+if (logs) {
+    const WRITESTREAM = fs.createWriteStream('./access.log', { flags: 'a' })
+    // Set up the access logging middleware
+    app.use(morgan('combined', { stream: WRITESTREAM }))
+}
+
 app.use( (req, res, next) => {
     let logdata = {
         remoteaddr: req.ip,
@@ -42,10 +48,9 @@ app.use( (req, res, next) => {
         referer: req.headers['referer'],
         useragent: req.headers['user-agent']
     }
-    console.log("secure: " + logdata.secure);
     const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, secure, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
     const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.secure ? 1 : 0, logdata.status, logdata.referer, logdata.useragent);
-    res.status(200).json(info);
+    res.status(200);
     next();
 });
 
@@ -90,15 +95,8 @@ if (debug) {
     });
 
     app.get('/app/error', (req, res) => {
-        res.status(500)
-        res.render('error', { error: 'Error test successful' })
+        throw new Error("Error test successful");
     });
-}
-
-if (logs) {
-    const WRITESTREAM = fs.createWriteStream('./access.log', { flags: 'a' })
-    // Set up the access logging middleware
-    app.use(morgan('combined', { stream: WRITESTREAM }))
 }
 
 app.use(function (req, res) {
