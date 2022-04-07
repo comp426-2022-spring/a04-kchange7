@@ -36,7 +36,7 @@ if (args['help']) {
 
 const HTTP_PORT = args.port ? args.port : 5555;
 const logs = args.log ? args.log : "true";
-const debug = args.debug ? args.debug : false;
+const debug = args.debug ? args.debug : "false";
 
 const server = app.listen(HTTP_PORT, () => {
     console.log('App listening on port %PORT%'.replace('%PORT%', HTTP_PORT))
@@ -98,7 +98,7 @@ app.get('/app/flip/call/:call', (req, res) => {
     res.json(result);
 });
 
-if (debug) {
+if (debug != "false") {
     app.get('/app/log/access', (req, res) => {
         try {
             const stmt = db.prepare('SELECT * FROM accesslog').all()
