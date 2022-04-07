@@ -16,7 +16,7 @@ args['help']
 args['log']
 
 if (args['help']) {
-    console.log("Note that if you try to test this using npx nodemon server.js --help it will display nodemon’s help message. Also, in order for this to work properly, the conditional has to come before all of the dependencies in your script, with the exception of whatever library you are using to parse command line arguments (minimist, yargs, etc.).")
+    console.log("Return this message and exit.")
     process.exit(0);
 }
 
@@ -34,7 +34,7 @@ if (logs) {
     app.use(morgan('combined', { stream: WRITESTREAM }))
 }
 
-app.use( (req, res, next) => {
+app.use((req, res, next) => {
     let logdata = {
         remoteaddr: req.ip,
         remoteuser: req.user,
